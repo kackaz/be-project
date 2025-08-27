@@ -4,6 +4,8 @@ import com.example.beproject.auth.dto.LoginRequest;
 import com.example.beproject.auth.dto.RegisterRequest;
 import com.example.beproject.auth.model.User;
 import com.example.beproject.auth.repository.UserRepository;
+import com.example.beproject.transfer.model.Account;
+import com.example.beproject.transfer.repository.AccountRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -18,11 +20,13 @@ import java.util.Date;
 public class AuthService {
 
     private final UserRepository repo;
+    private final AccountRepository accountRepo;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final byte[] jwtSecret;
 
-    public AuthService(UserRepository repo, @Value("${app.jwt.secret:defaultsecretkeydefaultsecret}") String secret) {
+    public AuthService(UserRepository repo, AccountRepository accountRepo, @Value("${app.jwt.secret:defaultsecretkeydefaultsecret}") String secret) {
         this.repo = repo;
+        this.accountRepo = accountRepo;
         this.jwtSecret = secret.getBytes();
     }
 
@@ -40,6 +44,16 @@ public class AuthService {
         u.phone = r.phone;
         u.birthday = r.birthday;
         repo.save(u);
+
+        // Create account for new user
+        Account account = new Account();
+        account.accountNumber = "LBK" + String.format("%06d", u.id);
+        account.accountName = u.firstname + " " + u.lastname;
+        account.balance = 15420.0; // Default balance as shown in screenshot
+        account.membershipLevel = "Gold";
+        account.userId = u.id;
+        accountRepo.save(account);
+
         return u;
     }
 

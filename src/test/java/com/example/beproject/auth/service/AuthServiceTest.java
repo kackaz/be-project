@@ -4,6 +4,7 @@ import com.example.beproject.auth.dto.LoginRequest;
 import com.example.beproject.auth.dto.RegisterRequest;
 import com.example.beproject.auth.model.User;
 import com.example.beproject.auth.repository.UserRepository;
+import com.example.beproject.transfer.repository.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,12 +23,15 @@ public class AuthServiceTest {
     @Mock
     private UserRepository repo;
 
+    @Mock
+    private AccountRepository accountRepo;
+
     private AuthService svc;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        svc = new AuthService(repo, "testsecretkeytestsecretkeytestsecret");
+        svc = new AuthService(repo, accountRepo, "testsecretkeytestsecretkeytestsecret");
     }
 
     @Test
